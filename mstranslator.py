@@ -109,10 +109,8 @@ class Translator(object):
             raise TranslateApiException(data)
 
         return data
-        # data[0]['translations'][0]['text']
 
     def _translate(self, action, body, lang_from, lang_to, contenttype, category):
-        print 'translate'
         if not lang_to:
             raise ValueError('lang_to parameter is required')
         if contenttype not in ('text/plain', 'text/html'):
@@ -134,24 +132,24 @@ class Translator(object):
         body = [{
             'text' : text
         }]
-        return self._translate('translate?api-version=3.0', body, lang_from, lang_to,
+        response = self._translate('translate?api-version=3.0', body, lang_from, lang_to,
                                contenttype, category)
+        return response[0]['translations'][0]['text']
 
     def translate_array(self, texts=[], lang_from=None, lang_to=None,
                         contenttype='text/plain', category='general'):
         body = [
             {'text' : text} for text in texts
         ]
-        print json.dumps(body)
         return self._translate('translate?api-version=3.0', body, lang_from, lang_to,
                                contenttype, category)
 
     def translate_array2(self, texts=[], lang_from=None, lang_to=None,
                         contenttype='text/plain', category='general'):
-        params = {
-            'texts': json.dumps(texts),
-        }
-        return self._translate('TranslateArray2', params, lang_from, lang_to,
+        body = [
+            {'text' : text} for text in texts
+        ]
+        return self._translate('translate?api-version=3.0', body, lang_from, lang_to,
                                contenttype, category)
 
     # def get_translations(self, text, lang_from, lang_to, max_n=10, contenttype='text/plain', category='general',
