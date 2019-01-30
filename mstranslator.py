@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import requests
 import datetime
 import json
+import logging
 try:
     basestring
 except NameError:
@@ -43,7 +44,8 @@ class AccessToken(object):
 
     def request_token(self):
         headers = {
-            'Ocp-Apim-Subscription-Key': self.subscription_key
+            'Ocp-Apim-Subscription-Key': self.subscription_key,
+            'Content-type': 'application/json'
         }
         resp = requests.post(self.access_url, headers=headers)
         if resp.status_code == 200:
@@ -64,7 +66,7 @@ class AccessToken(object):
 
 
 class Translator(object):
-    api_url = "https://api.microsofttranslator.com/v2/ajax.svc/"
+    api_url = "https://api.cognitive.microsofttranslator.com/"
 
     def __init__(self, subscription_key):
         self.auth = AccessToken(subscription_key)
@@ -72,9 +74,28 @@ class Translator(object):
     def make_url(self, action):
         return self.api_url + action
 
-    def make_request(self, action, params=None):
+    def make_request(self, action, params=None, body=None):
+        try:
+            import http.client as http_client
+        except ImportError:
+            # Python 2
+            import httplib as http_client
+        http_client.HTTPConnection.debuglevel = 1
+
+        # You must initialize logging, otherwise you'll not see debug output.
+        logging.basicConfig()
+        logging.getLogger().setLevel(logging.DEBUG)
+        requests_log = logging.getLogger("requests.packages.urllib3")
+        requests_log.setLevel(logging.DEBUG)
+        requests_log.propagate = True
+
         url = self.make_url(action)
-        resp = requests.get(url, auth=self.auth, params=params)
+        print '-------------------------------'
+        print 'url = '+url
+        print 'params = '+str(params)
+        print 'body = '+str(body)
+        print '-------------------------------'
+        resp = requests.post(url, auth=self.auth, params=params, json=body)
         return self.make_response(resp)
 
     def make_response(self, resp):
@@ -89,7 +110,8 @@ class Translator(object):
 
         return data
 
-    def _translate(self, action, text_params, lang_from, lang_to, contenttype, category):
+    def _translate(self, action, body, lang_from, lang_to, contenttype, category):
+        print 'translate'
         if not lang_to:
             raise ValueError('lang_to parameter is required')
         if contenttype not in ('text/plain', 'text/html'):
@@ -97,21 +119,21 @@ class Translator(object):
 
         params = {
             'to': lang_to,
-            'contentType': contenttype,
-            'category': category,
+            'category': category
         }
+
         if lang_from:
             params['from'] = lang_from
-        params.update(text_params)
+        # params.update(text_params)
 
-        return self.make_request(action, params)
+        return self.make_request(action, params, body)
 
     def translate(self, text, lang_from=None, lang_to=None,
                   contenttype='text/plain', category='general'):
-        params = {
-            'text': text,
-        }
-        return self._translate('Translate', params, lang_from, lang_to,
+        body = [{
+            'text' : text
+        }]
+        return self._translate('translate?api-version=3.0', body, lang_from, lang_to,
                                contenttype, category)
 
     def translate_array(self, texts=[], lang_from=None, lang_to=None,
