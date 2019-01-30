@@ -108,7 +108,8 @@ class Translator(object):
         if isinstance(data, basestring) and data.startswith("TranslateApiException"):
             raise TranslateApiException(data)
 
-        return data[0]['translations'][0]['text']
+        return data
+        # data[0]['translations'][0]['text']
 
     def _translate(self, action, body, lang_from, lang_to, contenttype, category):
         print 'translate'
@@ -138,10 +139,11 @@ class Translator(object):
 
     def translate_array(self, texts=[], lang_from=None, lang_to=None,
                         contenttype='text/plain', category='general'):
-        params = {
-            'texts': json.dumps(texts),
-        }
-        return self._translate('TranslateArray', params, lang_from, lang_to,
+        body = [
+            {'text' : text} for text in texts
+        ]
+        print json.dumps(body)
+        return self._translate('translate?api-version=3.0', body, lang_from, lang_to,
                                contenttype, category)
 
     def translate_array2(self, texts=[], lang_from=None, lang_to=None,
@@ -152,26 +154,26 @@ class Translator(object):
         return self._translate('TranslateArray2', params, lang_from, lang_to,
                                contenttype, category)
 
-    def get_translations(self, text, lang_from, lang_to, max_n=10, contenttype='text/plain', category='general',
-                         url=None, user=None, state=None):
-        options = {
-            'Category': category,
-            'ContentType': contenttype,
-        }
-        if url:
-            options['Uri'] = url
-        if user:
-            options['User'] = user
-        if state:
-            options['State'] = state
-        params = {
-            'text': text,
-            'to': lang_to,
-            'from': lang_from,
-            'maxTranslations': max_n,
-            'options': json.dumps(options)
-        }
-        return self.make_request('GetTranslations', params)
+    # def get_translations(self, text, lang_from, lang_to, max_n=10, contenttype='text/plain', category='general',
+    #                      url=None, user=None, state=None):
+    #     options = {
+    #         'Category': category,
+    #         'ContentType': contenttype,
+    #     }
+    #     if url:
+    #         options['Uri'] = url
+    #     if user:
+    #         options['User'] = user
+    #     if state:
+    #         options['State'] = state
+    #     params = {
+    #         'text': text,
+    #         'to': lang_to,
+    #         'from': lang_from,
+    #         'maxTranslations': max_n,
+    #         'options': json.dumps(options)
+    #     }
+    #     return self.make_request('GetTranslations', params)
 
     def break_sentences(self, text, lang):
         if len(text) > 10000:
