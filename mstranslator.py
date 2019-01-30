@@ -75,19 +75,19 @@ class Translator(object):
         return self.api_url + action
 
     def make_request(self, action, params=None, body=None):
-        try:
-            import http.client as http_client
-        except ImportError:
-            # Python 2
-            import httplib as http_client
-        http_client.HTTPConnection.debuglevel = 1
+        # try:
+        #     import http.client as http_client
+        # except ImportError:
+        #     # Python 2
+        #     import httplib as http_client
+        # http_client.HTTPConnection.debuglevel = 1
 
-        # You must initialize logging, otherwise you'll not see debug output.
-        logging.basicConfig()
-        logging.getLogger().setLevel(logging.DEBUG)
-        requests_log = logging.getLogger("requests.packages.urllib3")
-        requests_log.setLevel(logging.DEBUG)
-        requests_log.propagate = True
+        # # You must initialize logging, otherwise you'll not see debug output.
+        # logging.basicConfig()
+        # logging.getLogger().setLevel(logging.DEBUG)
+        # requests_log = logging.getLogger("requests.packages.urllib3")
+        # requests_log.setLevel(logging.DEBUG)
+        # requests_log.propagate = True
 
         url = self.make_url(action)
         print '-------------------------------'
@@ -108,7 +108,7 @@ class Translator(object):
         if isinstance(data, basestring) and data.startswith("TranslateApiException"):
             raise TranslateApiException(data)
 
-        return data
+        return data[0]['translations'][0]['text']
 
     def _translate(self, action, body, lang_from, lang_to, contenttype, category):
         print 'translate'
