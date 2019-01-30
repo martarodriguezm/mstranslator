@@ -198,7 +198,7 @@ class Translator(object):
         if len(text_orig) > 1000:
             raise ValueError('The original text maximum length is 1000 characters')
         if len(text_trans) > 2000:
-            raise ValueError('The translated text maximum length is 1000 characters')
+            raise ValueError('The translated text maximum length is 2000 characters')
         if contenttype not in ('text/plain', 'text/html'):
             raise ValueError('Invalid contenttype value')
         if not -10 < rating < 10 or not isinstance(rating, int):
@@ -226,13 +226,24 @@ class Translator(object):
             'locale': lang_to,
             'languageCodes': json.dumps(langs),
         }
-        return self.make_request('GetLanguageNames', params)
+        return self.make_request('languages', params)
 
     def detect_lang(self, text):
-        return self.make_request('Detect', {'text': text})
+        body = [
+            {'Text': text}
+        ]
+        response = self.make_request('detect', body = body)
+        return response[0]["language"]
 
     def detect_langs(self, texts=[]):
-        return self.make_request('DetectArray', {'texts': json.dumps(texts)})
+        body = [
+            {'Text' : text} for text in texts
+        ] 
+        response = self.make_request('detect', body = body)
+        parsedResponse = [ 
+            language["language"] for language in response
+        ]
+        return parsedResponse
 
     def speak(self, text, lang, format='audio/wav', best_quality=False):
         if format not in ('audio/wav', 'audio/mp3'):
