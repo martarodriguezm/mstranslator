@@ -72,7 +72,7 @@ class Translator(object):
         self.auth = AccessToken(subscription_key)
 
     def make_url(self, action):
-        return self.api_url + action
+        return self.api_url + action + '?api-version=3.0'
 
     def make_request(self, action, params=None, body=None):
         # try:
@@ -132,7 +132,7 @@ class Translator(object):
         body = [{
             'text' : text
         }]
-        response = self._translate('translate?api-version=3.0', body, lang_from, lang_to,
+        response = self._translate('translate', body, lang_from, lang_to,
                                contenttype, category)
         return response[0]['translations'][0]['text']
 
@@ -141,7 +141,7 @@ class Translator(object):
         body = [
             {'text' : text} for text in texts
         ]
-        return self._translate('translate?api-version=3.0', body, lang_from, lang_to,
+        return self._translate('translate', body, lang_from, lang_to,
                                contenttype, category)
 
     def translate_array2(self, texts=[], lang_from=None, lang_to=None,
@@ -149,7 +149,7 @@ class Translator(object):
         body = [
             {'text' : text} for text in texts
         ]
-        return self._translate('translate?api-version=3.0', body, lang_from, lang_to,
+        return self._translate('translate', body, lang_from, lang_to,
                                contenttype, category)
 
     # def get_translations(self, text, lang_from, lang_to, max_n=10, contenttype='text/plain', category='general',
@@ -177,15 +177,18 @@ class Translator(object):
         if len(text) > 10000:
             raise ValueError('The text maximum length is 10000 characters')
         params = {
-            'text': text,
             'language': lang,
         }
-        lengths = self.make_request('BreakSentences', params)
+        body = [
+            {'Text': text}
+        ]
+        lengths = self.make_request('breaksentence', params, body)
+        print lengths
         if isinstance(text, bytes):
             text = text.decode('utf-8')
         c = 0
         result = []
-        for i in lengths:
+        for i in lengths[0]['sentLen']:
             result.append(text[c:c+i])
             c += i
         return result
