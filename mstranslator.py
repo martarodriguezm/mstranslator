@@ -94,7 +94,7 @@ class Translator(object):
 
         return data
 
-    def _translate(self, action, body, lang_from, lang_to, contenttype, category):
+    def _translate(self, action, body, lang_from, lang_to, contenttype, category, includeAlignment = False):
         if not lang_to:
             raise ValueError('lang_to parameter is required')
         if contenttype not in ('text/plain', 'text/html'):
@@ -102,7 +102,8 @@ class Translator(object):
 
         params = {
             'to': lang_to,
-            'category': category
+            'category': category,
+            'includeAlignment': 'true' if includeAlignment else 'false'
         }
 
         if lang_from:
@@ -136,7 +137,7 @@ class Translator(object):
             {'text' : text} for text in texts
         ]
         return self._translate('translate', body, lang_from, lang_to,
-                               contenttype, category)
+                               contenttype, category, includeAlignment = True)
 
     def break_sentences(self, text, lang):
         if len(text) > 10000:

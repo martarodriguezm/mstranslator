@@ -44,23 +44,23 @@ class TranslatorTestCase(unittest.TestCase):
         self.translator_mock = TranslatorMock(SUBSCRIPTION_KEY)
 
     def test_translate(self):
-        t = self.translator.translate('world', 'en', 'ru')
-        self.assertEqual('мир', t)
+        t = self.translator.translate('world', 'en', 'es')
+        self.assertEqual('Mundo', t)
 
     def test_translate_exception(self):
         self.assertRaises(ArgumentOutOfRangeException, self.translator.translate, 'world', 'en', 'asdf')
 
     def test_translate_array(self):
-        ts = self.translator.translate_array(['hello', 'world'], 'en', 'ru')
-        translations = [t['TranslatedText'] for t in ts]
-        self.assertEqual(['Привет', 'мир'], translations)
+        ts = self.translator.translate_array(['hello', 'world'], 'en', 'es')
+        translations = [t['translations'][0]['text'] for t in ts]
+        self.assertEqual(['Hola', 'Mundo'], translations)
 
     def test_translate_array2(self):
-        ts = self.translator.translate_array2(['hello', 'world', 'Hello. How are you?'], 'en', 'ru')
-        translations = [t['TranslatedText'] for t in ts]
-        self.assertEqual(['Привет', 'мир', 'Привет. Как ваши дела?'], translations)
-        alignments = [t['Alignment'] for t in ts]
-        self.assertEqual(['0:4-0:5', '0:4-0:2', '0:5-0:6 7:18-8:21'], alignments)
+        ts = self.translator.translate_array2(['The answer lies in machine translation.'], 'en', 'es')
+        translations = [t['translations'][0]['text'] for t in ts]
+        self.assertEqual(['La respuesta radica en la traducción automática.'], translations)
+        alignments = [t['translations'][0]['alignment']['proj'] for t in ts]
+        self.assertEqual('0:2-0:1 4:9-3:11 11:14-13:18 16:17-20:21 19:25-37:46 27:37-26:35 38:38-47:47', alignments[0])
 
     def test_break_sentences(self):
         t = self.translator.break_sentences('Hello. How are you?', 'en')
