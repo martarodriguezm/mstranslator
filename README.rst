@@ -57,6 +57,7 @@ Microsoft has moved some features to other APIs and other are not longer support
 With this update we have tried to keep the functions input and output as they were, but it has not been posible in all cases.
 
 No changes needed for:
+
 - translate
 - break_sentences
 - get_langs
@@ -65,13 +66,16 @@ No changes needed for:
 - detect_langs
 
 Output has changed for:
+
 - translate_array: The output json is different, check official docs for details
 - translate_array2: The output json is different, check official docs for details
 
 Input has changed for:
+
 - get_langs: speakable input parameter has been removed
 
 Following functions have been removed because the API features have been moved to other APIs:
+
 - get_translations
 - add_translation
 - speak
