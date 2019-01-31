@@ -75,26 +75,7 @@ class Translator(object):
         return self.api_url + action + '?api-version=3.0'
 
     def make_request(self, action, params=None, body=None, headers=None, isPost=True):
-        # try:
-        #     import http.client as http_client
-        # except ImportError:
-        #     # Python 2
-        #     import httplib as http_client
-        # http_client.HTTPConnection.debuglevel = 1
-
-        # # You must initialize logging, otherwise you'll not see debug output.
-        # logging.basicConfig()
-        # logging.getLogger().setLevel(logging.DEBUG)
-        # requests_log = logging.getLogger("requests.packages.urllib3")
-        # requests_log.setLevel(logging.DEBUG)
-        # requests_log.propagate = True
-
         url = self.make_url(action)
-        print '-------------------------------'
-        print 'url = '+url
-        print 'params = '+str(params)
-        print 'body = '+str(body)
-        print '-------------------------------'
         if(isPost):
             resp = requests.post(url, auth=self.auth, params=params, json=body, headers=headers)
         else:
@@ -126,7 +107,6 @@ class Translator(object):
 
         if lang_from:
             params['from'] = lang_from
-        # params.update(text_params)
 
         return self.make_request(action, params, body)
 
