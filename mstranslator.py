@@ -117,7 +117,10 @@ class Translator(object):
         }]
         response = self._translate('translate', body, lang_from, lang_to,
                                contenttype, category)
-        return response[0]['translations'][0]['text']
+        if 'error' in response:
+            raise ArgumentOutOfRangeException(response['error']['message'])
+        else:
+            return response[0]['translations'][0]['text']
 
     def translate_array(self, texts=[], lang_from=None, lang_to=None,
                         contenttype='text/plain', category='general'):
