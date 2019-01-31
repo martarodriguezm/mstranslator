@@ -175,6 +175,17 @@ class Translator(object):
             c += i
         return result
 
+    def get_langs(self):
+        params = {
+            'scope': 'translation'
+        }
+
+        response = self.make_request('languages', params, isPost = False)
+        result = []
+        for lang in response['translation']:
+            result.append(lang)
+        return result
+
     def get_lang_names(self, langs, lang_to):
         params = {
             'scope': 'translation'
