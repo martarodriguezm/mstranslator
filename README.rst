@@ -47,6 +47,37 @@ Example Usage:
     >>> print(translator.translate('Привет, мир!', lang_from='ru', lang_to='en'))
     Hello World!
 
+3. Translator Text API V2 to V3 Migration
+-----------------------------------------
+
+Translator Text API V2 was deprecated on April 30, 2018 and will be discontinued on April 30, 2019. So this API wrapper has been updated to V3 API version.
+
+Microsoft has moved some features to other APIs and other are not longer supported. Check the official `Translator Text API V2 to V3 Migration`_ documentation for details.
+
+With this update we have tried to keep the functions input and output as they were, but it has not been posible in all cases.
+
+No changes needed for:
+- translate
+- break_sentences
+- get_langs
+- get_lang_names
+- detect_lang
+- detect_langs
+
+Output has changed for:
+- translate_array: The output json is different, check official docs for details
+- translate_array2: The output json is different, check official docs for details
+
+Input has changed for:
+- get_langs: speakable input parameter has been removed
+
+Following functions have been removed because the API features have been moved to other APIs:
+- get_translations
+- add_translation
+- speak
+- speak_to_file
+
+
 Testing
 =======
 To run tests you need to set ``TEST_MSTRANSLATOR_SUBSCRIPTION_KEY`` environment variable
@@ -58,3 +89,4 @@ and install `tox`_ package. After that run shell command:
 
 .. _Microsoft Azure: http://azure.com
 .. _tox: http://tox.readthedocs.org/en/latest/
+.. _Translator Text API V2 to V3 Migration: https://docs.microsoft.com/en-us/azure/cognitive-services/translator/migrate-to-v3
