@@ -62,19 +62,9 @@ class TranslatorTestCase(unittest.TestCase):
         alignments = [t['Alignment'] for t in ts]
         self.assertEqual(['0:4-0:5', '0:4-0:2', '0:5-0:6 7:18-8:21'], alignments)
 
-    def test_get_translations(self):
-        t = self.translator.get_translations('world', 'en', 'ru')
-        self.assertIsInstance(t, dict)
-        self.assertIn('Translations', t)
-
     def test_break_sentences(self):
         t = self.translator.break_sentences('Hello. How are you?', 'en')
         self.assertEqual(['Hello. ', 'How are you?'], t)
-
-    def test_add_translation(self):
-        url = self.translator_mock.add_translation('orig', 'trans', 'en', 'ru', user='test')
-        self.assertIn('originalText=orig', url)
-        self.assertIn('translatedText=trans', url)
 
     def test_get_langs(self):
         langs = self.translator.get_langs()
@@ -85,22 +75,8 @@ class TranslatorTestCase(unittest.TestCase):
         lang_names = self.translator.get_lang_names(['ru', 'en'], 'en')
         self.assertEqual(['Russian', 'English'], lang_names)
 
-    def test_get_speackable_langs(self):
-        langs = self.translator.get_langs(speakable=True)
-        self.assertIsInstance(langs, list)
-        self.assertIn('en-us', langs)
-
     def test_detect_lang(self):
         self.assertEqual('en', self.translator.detect_lang('Hello'))
 
     def test_detect_langs(self):
         self.assertEqual(['en', 'ru'], self.translator.detect_langs(['Hello', 'Привет']))
-
-    def test_speak(self):
-        self.assertIsNotNone(self.translator.speak('Hello', 'en'))
-
-    def test_speak_to_file(self):
-        s = StringIO()
-        self.translator.speak_to_file(s, 'Hello', 'en')
-        s.seek(0)
-        self.assertTrue(len(s.read()) > 0)
