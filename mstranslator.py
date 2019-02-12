@@ -44,7 +44,7 @@ class AccessToken(object):
     def request_token(self):
         headers = {
             'Ocp-Apim-Subscription-Key': self.subscription_key,
-            'Content-type': 'application/json'
+            'Content-type': 'application/json',
         }
         resp = requests.post(self.access_url, headers=headers)
         if resp.status_code == 200:
