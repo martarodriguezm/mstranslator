@@ -78,7 +78,7 @@ class Translator(object):
         if(is_post):
             resp = requests.post(url, auth=self.auth, params=params, json=json, headers=headers)
         else:
-            resp = requests.get(url, auth=self.auth, params=params, json=json, headers=headers)
+            resp = requests.get(url, auth=self.auth, params=params, headers=headers)
         return self.make_response(resp)
 
     def make_response(self, resp):
