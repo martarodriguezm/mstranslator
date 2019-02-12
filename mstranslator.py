@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import requests
 import datetime
 import json
-import logging
 try:
     basestring
 except NameError:
@@ -74,12 +73,12 @@ class Translator(object):
     def make_url(self, action):
         return self.api_url + action + '?api-version=3.0'
 
-    def make_request(self, action, params=None, body=None, headers=None, isPost=True):
+    def make_request(self, action, params=None, json=None, headers=None, is_post=True):
         url = self.make_url(action)
-        if(isPost):
-            resp = requests.post(url, auth=self.auth, params=params, json=body, headers=headers)
+        if(is_post):
+            resp = requests.post(url, auth=self.auth, params=params, json=json, headers=headers)
         else:
-            resp = requests.get(url, auth=self.auth, params=params, json=body, headers=headers)
+            resp = requests.get(url, auth=self.auth, params=params, json=json, headers=headers)
         return self.make_response(resp)
 
     def make_response(self, resp):
@@ -94,7 +93,7 @@ class Translator(object):
 
         return data
 
-    def _translate(self, action, body, lang_from, lang_to, contenttype, category, includeAlignment = False):
+    def _translate(self, action, json, lang_from, lang_to, contenttype, category, include_alignment=False):
         if not lang_to:
             raise ValueError('lang_to parameter is required')
         if contenttype not in ('text/plain', 'text/html'):
@@ -103,20 +102,20 @@ class Translator(object):
         params = {
             'to': lang_to,
             'category': category,
-            'includeAlignment': 'true' if includeAlignment else 'false'
+            'includeAlignment': 'true' if include_alignment else 'false'
         }
 
         if lang_from:
             params['from'] = lang_from
 
-        return self.make_request(action, params, body)
+        return self.make_request(action, params, json)
 
     def translate(self, text, lang_from=None, lang_to=None,
                   contenttype='text/plain', category='general'):
-        body = [{
-            'text' : text
+        json = [{
+            'Text' : text
         }]
-        response = self._translate('translate', body, lang_from, lang_to,
+        response = self._translate('translate', json, lang_from, lang_to,
                                contenttype, category)
         if 'error' in response:
             raise ArgumentOutOfRangeException(response['error']['message'])
@@ -125,19 +124,19 @@ class Translator(object):
 
     def translate_array(self, texts=[], lang_from=None, lang_to=None,
                         contenttype='text/plain', category='general'):
-        body = [
-            {'text' : text} for text in texts
+        json = [
+            {'Text' : text} for text in texts
         ]
-        return self._translate('translate', body, lang_from, lang_to,
+        return self._translate('translate', json, lang_from, lang_to,
                                contenttype, category)
 
     def translate_array2(self, texts=[], lang_from=None, lang_to=None,
                         contenttype='text/plain', category='general'):
-        body = [
-            {'text' : text} for text in texts
+        json = [
+            {'Text' : text} for text in texts
         ]
-        return self._translate('translate', body, lang_from, lang_to,
-                               contenttype, category, includeAlignment = True)
+        return self._translate('translate', json, lang_from, lang_to,
+                               contenttype, category, include_alignment=True)
 
     def break_sentences(self, text, lang):
         if len(text) > 10000:
@@ -145,11 +144,10 @@ class Translator(object):
         params = {
             'language': lang,
         }
-        body = [
+        json = [
             {'Text': text}
         ]
-        lengths = self.make_request('breaksentence', params, body)
-        print lengths
+        lengths = self.make_request('breaksentence', params, json)
         if isinstance(text, bytes):
             text = text.decode('utf-8')
         c = 0
@@ -164,7 +162,7 @@ class Translator(object):
             'scope': 'translation'
         }
 
-        response = self.make_request('languages', params, isPost = False)
+        response = self.make_request('languages', params, is_post=False)
         result = []
         for lang in response['translation']:
             result.append(lang)
@@ -177,25 +175,25 @@ class Translator(object):
         headers = {
             'Accept-Language': lang_to
         }
-        response = self.make_request('languages', params, headers = headers, isPost = False)
+        response = self.make_request('languages', params, headers=headers, is_post=False)
         result = []
         for lang in langs:
-            if(lang in response['translation']):
+            if lang in response['translation']:
                 result.append(response['translation'][lang]['name'])
         return result
 
     def detect_lang(self, text):
-        body = [
+        json = [
             {'Text': text}
         ]
-        response = self.make_request('detect', body = body)
+        response = self.make_request('detect', json=json)
         return response[0]["language"]
 
     def detect_langs(self, texts=[]):
-        body = [
+        json = [
             {'Text' : text} for text in texts
         ] 
-        response = self.make_request('detect', body = body)
+        response = self.make_request('detect', json=json)
         parsedResponse = [ 
             language["language"] for language in response
         ]
