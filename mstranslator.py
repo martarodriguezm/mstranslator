@@ -163,9 +163,7 @@ class Translator(object):
         }
 
         response = self.make_request('languages', params, is_post=False)
-        result = []
-        for lang in response['translation']:
-            result.append(lang)
+        result = [lang for lang in response['translation']]
         return result
 
     def get_lang_names(self, langs, lang_to):
